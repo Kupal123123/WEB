@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- ============================================================
+     MYSHOP - Simple E-Commerce Page
+     Sections:
+       1. CSS Styles
+       2. HTML Layout  (Navbar, Grid, 3 Modals, Toast)
+       3. JavaScript   (Databases, Functions)
+============================================================ -->
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyShop</title>
+</head>
+
+
+<!-- ============================================================
+     1. CSS STYLES
+============================================================ -->
+<style>
+
+    /* --- Reset & Base --- */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        color: #222;
+    }
+
+
+    /* --- Navbar --- */
+    nav {
+        background: #222;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        height: 60px;
+    }
+
+    nav .logo {
+        font-size: 22px;
+        font-weight: bold;
+        color: white;
+    }
+
+    nav .nav-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+
+    /* --- Buttons --- */
+    button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+    }
+
+    .btn-dark {
+        background: #444;
+        color: white;
+    }
+
+    .btn-orange {
+        background: #e05e00;
+        color: white;
+    }
+
+    .btn-orange:hover,
+    .btn-dark:hover {
+        opacity: 0.85;
+    }
+
+
+    /* --- Page Title --- */
+    .page-title {
+        text-align: center;
+        padding: 30px 10px 10px;
+        font-size: 28px;
+    }
+
+
+    /* --- Product Grid --- */
+    .grid-wrapper {
+        max-width: 1100px;
+        margin: 20px auto;
+        padding: 0 20px;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .product-card {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .product-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .product-card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .product-card .no-image {
+        width: 100%;
+        height: 180px;
+        background: #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #888;
+        font-size: 13px;
+    }
+
+    .card-info {
+        padding: 12px;
+    }
+
+    .card-info .name {
+        font-weight: bold;
+        font-size: 15px;
+    }
+
+    .card-info .desc {
+        font-size: 13px;
+        color: #666;
+        margin: 4px 0 8px;
+    }
+
+    .card-info .price {
+        font-size: 16px;
+        font-weight: bold;
+        color: #e05e00;
+    }
+
+    .card-info .stock {
+        font-size: 12px;
+        color: #888;
+        margin-top: 3px;
+    }
+
+    .empty-msg {
+        text-align: center;
+        padding: 60px;
+        color: #888;
+        grid-column: 1 / -1;
+    }
+
+
+    /* --- Modals (shared style) --- */
+    .overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .overlay.open {
+        display: flex;
+    }
+
+    .modal {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        width: 100%;
+        max-width: 460px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .modal h2 {
+        margin-bottom: 15px;
+        font-size: 20px;
+    }
+
+    .modal .close-btn {
+        position: absolute;
+        top: 12px;
+        right: 15px;
+        background: none;
+        font-size: 20px;
+        color: #666;
+        padding: 0;
+    }
+
+
+    /* --- Modal: Product Image --- */
+    .modal-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .modal-no-image {
+        width: 100%;
+        height: 200px;
+        background: #ddd;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #888;
+        margin-bottom: 12px;
+        font-size: 13px;
+    }
+
+    .modal-price {
+        font-size: 18px;
+        font-weight: bold;
+        color: #e05e00;
+        margin-bottom: 15px;
+    }
+
+
+    /* --- Form Fields --- */
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 4px;
+        margin-top: 12px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 65px;
+    }
+
+
+    /* --- Quantity Row (in order modal) --- */
+    .qty-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 8px 0 15px;
+    }
+
+    .qty-row span {
+        font-size: 18px;
+        font-weight: bold;
+        min-width: 30px;
+        text-align: center;
+    }
+
+
+    /* --- Total Row (in order modal) --- */
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        background: #f4f4f4;
+        border-radius: 6px;
+        padding: 10px 14px;
+        margin-bottom: 15px;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .total-row .amount {
+        color: #e05e00;
+    }
+
+
+    /* --- Image Upload Box --- */
+    .upload-box {
+        border: 2px dashed #ccc;
+        border-radius: 6px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        margin-top: 4px;
+        background: #fafafa;
+        color: #888;
+        font-size: 13px;
+    }
+
+    .upload-box img {
+        max-height: 120px;
+        max-width: 100%;
+        border-radius: 4px;
+    }
+
+
+    /* --- Orders Table --- */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    th {
+        background: #f4f4f4;
+        text-align: left;
+        padding: 8px 10px;
+        color: #555;
+    }
+
+    td {
+        padding: 8px 10px;
+        border-top: 1px solid #eee;
+    }
+
+    .badge {
+        background: #d4f5d4;
+        color: #1a6e1a;
+        border-radius: 20px;
+        padding: 2px 10px;
+        font-size: 12px;
+    }
+
+
+    /* --- Toast Notification --- */
+    #toast {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        background: #222;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 14px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+        z-index: 999;
+    }
+
+    #toast.show {
+        opacity: 1;
+    }
+
+</style>
+
+
+<!-- ============================================================
+     2. HTML LAYOUT
+============================================================ -->
+<body>
+
+
+    <!-- NAVBAR -->
+    <nav>
+        <div class="logo">MyShop</div>
+        <div class="nav-buttons">
+            <button class="btn-dark" onclick="openModal('orders-modal')">
+                Orders <span id="order-count">0</span>
+            </button>
+            <button class="btn-orange" onclick="openModal('add-modal')">+ Add Product</button>
+        </div>
+    </nav>
+
+
+    <!-- PAGE TITLE -->
+    <div class="page-title">Our Products</div>
+
+
+    <!-- PRODUCT GRID -->
+    <div class="grid-wrapper">
+        <div class="product-grid" id="product-grid">
+            <!-- Cards are built by JavaScript -->
+        </div>
+    </div>
+
+
+    <!-- ======================================================
+         MODAL 1: Order Modal (opens when you click a product)
+    ====================================================== -->
+    <div class="overlay" id="product-modal" onclick="closeOnOverlay(event, 'product-modal')">
+        <div class="modal">
+
+            <button class="close-btn" onclick="closeModal('product-modal')">&#x2715;</button>
+
+            <!-- Product image -->
+            <div id="pm-image-wrap"></div>
+
+            <!-- Product info -->
+            <h2 id="pm-name"></h2>
+            <div id="pm-desc" style="color:#666; font-size:14px; margin-bottom:10px;"></div>
+            <div class="modal-price" id="pm-price"></div>
+
+            <!-- Customer name -->
+            <label>Your Name</label>
+            <input type="text" id="pm-customer" placeholder="Enter your name" />
+
+            <!-- Quantity picker -->
+            <label>Quantity</label>
+            <div class="qty-row">
+                <button class="btn-dark" onclick="changeQty(-1)">&#8722;</button>
+                <span id="qty-display">1</span>
+                <button class="btn-dark" onclick="changeQty(+1)">+</button>
+            </div>
+
+            <!-- Total -->
+            <div class="total-row">
+                <span>Total</span>
+                <span class="amount" id="pm-total">$0.00</span>
+            </div>
+
+            <button class="btn-orange" style="width:100%; padding:10px;" onclick="placeOrder()">
+                Place Order
+            </button>
+
+        </div>
+    </div>
+
+
+    <!-- ======================================================
+         MODAL 2: Add Product Modal
+    ====================================================== -->
+    <div class="overlay" id="add-modal" onclick="closeOnOverlay(event, 'add-modal')">
+        <div class="modal">
+
+            <button class="close-btn" onclick="closeModal('add-modal')">&#x2715;</button>
+            <h2>Add New Product</h2>
+
+            <label>Product Name</label>
+            <input type="text" id="ap-name" placeholder="e.g. Leather Wallet" />
+
+            <label>Description</label>
+            <textarea id="ap-desc" placeholder="Short description..."></textarea>
+
+            <label>Price ($)</label>
+            <input type="number" id="ap-price" placeholder="0.00" min="0" step="0.01" />
+
+            <label>Stock</label>
+            <input type="number" id="ap-stock" placeholder="10" min="0" />
+
+            <label>Product Image</label>
+            <!-- Clicking the box triggers the hidden file input -->
+            <div class="upload-box" onclick="document.getElementById('ap-file').click()">
+                <div id="ap-preview">&#128193; Click to upload image</div>
+                <input
+                    type="file"
+                    id="ap-file"
+                    accept="image/*"
+                    style="display:none"
+                    onchange="previewImage(event)"
+                />
+            </div>
+
+            <br>
+            <button class="btn-orange" style="width:100%; padding:10px;" onclick="addProduct()">
+                Add to Store
+            </button>
+
+        </div>
+    </div>
+
+
+    <!-- ======================================================
+         MODAL 3: Orders Modal
+    ====================================================== -->
+    <div class="overlay" id="orders-modal" onclick="closeOnOverlay(event, 'orders-modal')">
+        <div class="modal" style="max-width:700px;">
+
+            <button class="close-btn" onclick="closeModal('orders-modal')">&#x2715;</button>
+            <h2>Order Records</h2>
+
+            <div id="orders-content">
+                <!-- Table is built by JavaScript -->
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast"></div>
+
+
+<!-- ============================================================
+     3. JAVASCRIPT
+============================================================ -->
+<script>
+
+    // =====================================================
+    // DATABASES
+    // =====================================================
+
+    // Product Database — add objects here to pre-load products
+    // Each product: { id, name, desc, price, stock, image }
+    // image = base64 data URL (set when user uploads a file)
+    const productDB = [];
+
+    // Order Database — every placed order gets pushed here
+    // Each order: { id, customer, product, qty, total, date }
+    const orderDB = [];
+
+    // Auto-increment IDs
+    let nextProductId = 1;
+    let nextOrderId   = 1001;
+
+    // Tracks which product the user clicked on
+    let activeProduct = null;
+    let currentQty    = 1;
+
+    // Holds the base64 image from the file picker (before saving)
+    let pendingImage = '';
+
+
+    // =====================================================
+    // RENDER PRODUCT GRID
+    // Reads productDB and builds the card HTML
+    // =====================================================
+
+    function renderGrid() {
+
+        const grid = document.getElementById('product-grid');
+        grid.innerHTML = '';
+
+        // Show message if no products exist yet
+        if (productDB.length === 0) {
+            grid.innerHTML = '<div class="empty-msg">No products yet. Click + Add Product to get started.</div>';
+            return;
+        }
+
+        // Build one card per product
+        productDB.forEach(function(product) {
+
+            // Build the image or placeholder
+            let imageHTML = '';
+            if (product.image) {
+                imageHTML = '<img src="' + product.image + '" alt="' + product.name + '" />';
+            } else {
+                imageHTML = '<div class="no-image">No Image</div>';
+            }
+
+            // Build the stock label
+            let stockLabel = product.stock > 0 ? product.stock + ' in stock' : 'Out of stock';
+
+            // Build the full card
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML =
+                imageHTML +
+                '<div class="card-info">' +
+                    '<div class="name">'  + product.name + '</div>' +
+                    '<div class="desc">'  + product.description + '</div>' +
+                    '<div class="price">$' + product.price.toFixed(2) + '</div>' +
+                    '<div class="stock">' + stockLabel + '</div>' +
+                '</div>';
+
+            // Clicking the card opens the order modal
+            card.onclick = function() { openProductModal(product); };
+
+            grid.appendChild(card);
+        });
+    }
+
+
+    // =====================================================
+    // ORDER MODAL — opens when user clicks a product card
+    // =====================================================
+
+    function openProductModal(product) {
+
+        // Remember which product is being ordered
+        activeProduct = product;
+        currentQty    = 1;
+
+        // Fill in the image
+        const imageWrap = document.getElementById('pm-image-wrap');
+        if (product.image) {
+            imageWrap.innerHTML = '<img class="modal-image" src="' + product.image + '" alt="' + product.name + '" />';
+        } else {
+            imageWrap.innerHTML = '<div class="modal-no-image">No Image</div>';
+        }
+
+        // Fill in the text fields
+        document.getElementById('pm-name').textContent  = product.name;
+        document.getElementById('pm-desc').textContent  = product.description;
+        document.getElementById('pm-price').textContent = '$' + product.price.toFixed(2) + ' each';
+        document.getElementById('pm-customer').value    = '';
+        document.getElementById('qty-display').textContent = 1;
+
+        updateTotal();
+        openModal('product-modal');
+    }
+
+    // + or - button in the order modal
+    function changeQty(delta) {
+        currentQty = currentQty + delta;
+
+        // Keep quantity between 1 and available stock
+        if (currentQty < 1)                   currentQty = 1;
+        if (currentQty > activeProduct.stock) currentQty = activeProduct.stock;
+
+        document.getElementById('qty-display').textContent = currentQty;
+        updateTotal();
+    }
+
+    // Recalculate and show the total price
+    function updateTotal() {
+        const total = activeProduct.price * currentQty;
+        document.getElementById('pm-total').textContent = '$' + total.toFixed(2);
+    }
+
+    // Called when user clicks "Place Order"
+    function placeOrder() {
+
+        const customer = document.getElementById('pm-customer').value.trim();
+
+        // Validation
+        if (!customer)                        { showToast('Please enter your name.'); return; }
+        if (currentQty > activeProduct.stock) { showToast('Not enough stock!');       return; }
+
+        // Deduct stock from the product
+        activeProduct.stock -= currentQty;
+
+        // Save the order to orderDB
+        const order = {
+            id:       nextOrderId++,
+            customer: customer,
+            product:  activeProduct.name,
+            qty:      currentQty,
+            total:    (activeProduct.price * currentQty).toFixed(2),
+            date:     new Date().toLocaleString()
+        };
+        orderDB.push(order);
+
+        // Update the order count badge in the navbar
+        document.getElementById('order-count').textContent = orderDB.length;
+
+        closeModal('product-modal');
+        renderGrid();
+        showToast('Order #' + order.id + ' placed for ' + customer + '!');
+    }
+
+
+    // =====================================================
+    // ADD PRODUCT MODAL
+    // =====================================================
+
+    // When user picks a file, read it as base64 and show a preview
+    function previewImage(event) {
+
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            pendingImage = e.target.result; // base64 data URL - ready for LONGBLOB storage
+            document.getElementById('ap-preview').innerHTML =
+                '<img src="' + pendingImage + '" alt="Preview" />';
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    // Called when user clicks "Add to Store"
+    function addProduct() {
+
+        const name  = document.getElementById('ap-name').value.trim();
+        const description = document.getElementById('ap-desc').value.trim();
+        const price = parseFloat(document.getElementById('ap-price').value);
+        const stock = parseInt(document.getElementById('ap-stock').value);
+
+        // Validation
+        if (!name)                    { showToast('Product name is required.'); return; }
+        if (isNaN(price) || price < 0) { showToast('Enter a valid price.');     return; }
+        if (isNaN(stock) || stock < 0) { showToast('Enter a valid stock.');     return; }
+
+        // Save to productDB
+        productDB.push({
+            id:    nextProductId++,
+            name:  name,
+            description: description,
+            price: price,
+            stock: stock,
+            image: pendingImage   // base64 string (empty string if no image uploaded)
+        });
+
+        // Reset the form
+        document.getElementById('ap-name').value  = '';
+        document.getElementById('ap-desc').value  = '';
+        document.getElementById('ap-price').value = '';
+        document.getElementById('ap-stock').value = '';
+        document.getElementById('ap-file').value  = '';
+        document.getElementById('ap-preview').innerHTML = '&#128193; Click to upload image';
+        pendingImage = '';
+
+        closeModal('add-modal');
+        renderGrid();
+        showToast('"' + name + '" added to the store!');
+    }
+
+
+    // =====================================================
+    // ORDERS MODAL - shows the orderDB as a table
+    // =====================================================
+
+    function showOrders() {
+
+        const container = document.getElementById('orders-content');
+
+        if (orderDB.length === 0) {
+            container.innerHTML = '<p style="color:#888; padding:20px 0;">No orders yet.</p>';
+            document.getElementById('orders-modal').classList.add('open');
+            return;
+        }
+
+        // Build the table rows from orderDB
+        let rows = '';
+        orderDB.forEach(function(order) {
+            rows +=
+                '<tr>' +
+                    '<td>' + order.id       + '</td>' +
+                    '<td>' + order.customer + '</td>' +
+                    '<td>' + order.product  + '</td>' +
+                    '<td>' + order.qty      + '</td>' +
+                    '<td>$' + order.total   + '</td>' +
+                    '<td>' + order.date     + '</td>' +
+                    '<td><span class="badge">Done</span></td>' +
+                '</tr>';
+        });
+
+        container.innerHTML =
+            '<table>' +
+                '<thead>' +
+                    '<tr>' +
+                        '<th>#</th>' +
+                        '<th>Customer</th>' +
+                        '<th>Product</th>' +
+                        '<th>Qty</th>' +
+                        '<th>Total</th>' +
+                        '<th>Date</th>' +
+                        '<th>Status</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+        document.getElementById('orders-modal').classList.add('open');
+    }
+
+
+    // =====================================================
+    // MODAL HELPERS
+    // =====================================================
+
+    function openModal(id) {
+        // Orders modal needs to build its table first
+        if (id === 'orders-modal') {
+            showOrders();
+            return;
+        }
+        document.getElementById(id).classList.add('open');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+    }
+
+    // Close modal if user clicks the dark background (not the modal box itself)
+    function closeOnOverlay(event, id) {
+        if (event.target.id === id) {
+            closeModal(id);
+        }
+    }
+
+
+    // =====================================================
+    // TOAST NOTIFICATION
+    // =====================================================
+
+    let toastTimer;
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function() {
+            toast.classList.remove('show');
+        }, 2800);
+    }
+
+
+    // =====================================================
+    // START - render the grid on page load
+    // =====================================================
+    renderGrid();
+
+</script>
+
+</body>
+</html>
