@@ -1,0 +1,23 @@
+* {
+    box-sizing: border-box; /* Malay ko */
+    padding: 0; /* Nagbibigay ng space sa loob ng element */
+    margin: 0; /* Naglalagay ng space sa labas ng element */
+    /* Recommended to lagi sa una, para walang spaces sa webpages nyo */
+}
+
+.flex {
+    display: flex; /* Para mag tabi tabi yung laman ng container */
+    flex-wrap: wrap; /* Para mag wrap yung laman ng container pag di na kasya sa isang line */
+    gap: 20px; /* Para lagyan ng space yung mga laman ng container or di mag dikit-dikit */
+    justify-content: center; /* Para i-center yung laman ng container horizontally */
+    /* justify-content: space-between; */
+    /* justify-content: space-around; */
+    /* justify-content: space-evenly; */
+    align-items: center; /* Para i-center din yung laman ng container vertically */
+}
+
+.grid {
+    display: grid; /* Para mag grid yung laman ng container */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Para mag adjust yung column ng grid base sa laki ng screen, 200px minimum, 1fr maximum */
+    gap: 20px; /* Para lagyan ng space yung mga laman ng container or di mag dikit-dikit */
+}
